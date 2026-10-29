@@ -1,0 +1,40 @@
+<dashboard version="1.1" theme="dark">
+  <label>SSH Authentifizierung - Uebersicht</label>
+  <row>
+    <panel>
+      <title>Anmeldungen: Erfolg vs. Fehlschlag</title>
+      <chart>
+        <search>
+          <query>index=lab_auth sourcetype=lab:auth | timechart span=10m count BY action</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 Quell-IPs mit Fehlversuchen</title>
+      <table>
+        <search>
+          <query>index=lab_auth action=failure | stats count AS failures dc(user) AS users BY src_ip | sort - failures | head 10</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>Am haeufigsten angegriffene Benutzer</title>
+      <chart>
+        <search>
+          <query>index=lab_auth action=failure | top limit=10 user</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+      </chart>
+    </panel>
+  </row>
+</dashboard>
