@@ -1,0 +1,16 @@
+services:
+  splunk:
+    image: splunk/splunk:latest
+    container_name: splunk-siem-lab
+    environment:
+      SPLUNK_START_ARGS: "--accept-license"
+      SPLUNK_PASSWORD: "${SPLUNK_PASSWORD}"
+    ports:
+      - "8000:8000"   # Web-Oberfläche
+    volumes:
+      - ./splunk/apps/siem_lab:/opt/splunk/etc/apps/siem_lab
+      - ./logs:/var/log/lab:ro
+      - splunk-var:/opt/splunk/var
+
+volumes:
+  splunk-var:

@@ -1,0 +1,16 @@
+# Nuetzliche SPL-Abfragen fuer das SIEM-Lab (index=lab_auth)
+
+# 1) Alle Fehlversuche der letzten 24 Stunden
+index=lab_auth sourcetype=lab:auth action=failure | table _time src_ip user
+
+# 2) Angreifer-IPs nach Anzahl der Fehlversuche
+index=lab_auth action=failure | stats count AS failures dc(user) AS users BY src_ip | sort - failures
+
+# 3) Fehlversuche pro Zeitfenster (Anomalie sichtbar machen)
+index=lab_auth action=failure | timechart span=5m count
+
+# 4) Erfolgreiche Anmeldungen von externen IPs (nicht 10.0.0.0/16)
+index=lab_auth action=success NOT src_ip=10.0.* | table _time user src_ip
+
+# 5) Benutzer mit ungewoehnlich vielen verschiedenen Quell-IPs
+index=lab_auth action=success | stats dc(src_ip) AS ips BY user | where ips > 5
